@@ -1,7 +1,7 @@
 let fruits = [];
 let currentFruit = null;
-let radiusList = [150, 200, 255, 300, 355, 400]; // 只保留6個等級（直徑100,150,250,300,350,400）
-let colors = ['#f99', '#f90', '#ff0', '#0f0', '#0ff', '#f0f']; // 6種顏色
+let radiusList = [];
+let colors = ['#f99', '#f90', '#ff0', '#0f0', '#0ff', '#f0f'];
 let gravity = 0.3;
 
 let video;
@@ -11,11 +11,12 @@ let noseX = 200;
 let mouthOpen = false;
 let mouthJustClosed = false;
 let gameOver = false;
-let gameStarted = false; // 新增：遊戲是否開始
-let win = false; // 新增
+let gameStarted = false;
+let win = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  radiusList = getRadiusList();
   video = createCapture(VIDEO);
   video.size(320, 240);
   video.hide();
@@ -32,12 +33,14 @@ function gotResults(results) {
 function draw() {
   background(240);
 
-  // 顯示攝影機畫面
-  image(video, width - 160, 10, 120, 90);
+  // 攝影機縮圖依比例
+  let camW = width * 0.15;
+  let camH = height * 0.15;
+  image(video, width - camW - 10, 10, camW, camH);
 
-  // 畫1/10高度的紅線
+  // 紅線高度依比例
   stroke(255, 0, 0);
-  strokeWeight(3);
+  strokeWeight(max(2, width * 0.005));
   let lineY = height / 10;
   line(0, lineY, width, lineY);
   noStroke();
@@ -47,38 +50,38 @@ function draw() {
     fill(255);
     stroke(0);
     rectMode(CENTER);
-    rect(width / 2, height / 2, 200, 100, 20);
+    rect(width / 2, height / 2, width * 0.25, height * 0.12, 20);
     fill(0);
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(32);
+    textSize(width * 0.04);
     text("開始遊戲", width / 2, height / 2);
     return;
   }
 
   // ======= 遊戲結束畫面 =======
   if (gameOver) {
-    drawFruits(); // 只畫圓形，不更新
-    textSize(64);
+    drawFruits();
+    textSize(width * 0.08);
     fill(255, 0, 0);
     textAlign(CENTER, CENTER);
-    text('Game Over', width / 2, height / 2 - 40);
-    textSize(32);
+    text('Game Over', width / 2, height / 2 - height * 0.05);
+    textSize(width * 0.04);
     fill(0);
-    text('點擊任一處重新開始', width / 2, height / 2 + 40);
-    return; // 不再 updateFruits
+    text('點擊任一處重新開始', width / 2, height / 2 + height * 0.05);
+    return;
   }
 
   // ======= 勝利畫面 =======
   if (win) {
     drawFruits();
-    textSize(64);
+    textSize(width * 0.08);
     fill('#a0f');
     textAlign(CENTER, CENTER);
-    text('你贏了！', width / 2, height / 2 - 40);
-    textSize(32);
+    text('你贏了！', width / 2, height / 2 - height * 0.05);
+    textSize(width * 0.04);
     fill(0);
-    text('點擊任一處重新開始', width / 2, height / 2 + 40);
+    text('點擊任一處重新開始', width / 2, height / 2 + height * 0.05);
     return;
   }
 
@@ -86,10 +89,10 @@ function draw() {
   updateFruits();
   drawFruits();
 
-  // 勝利判斷（每幀都檢查）
+  // 勝利判斷
   let maxLevel = radiusList.length - 1;
   let bigCount = fruits.filter(f => f.level === maxLevel).length;
-  if (bigCount >= 3) { // 由4改成3
+  if (bigCount >= 3) {
     win = true;
   }
 }
@@ -111,7 +114,7 @@ function startGame() {
   fruits = [];
   currentFruit = null;
   gameOver = false;
-  win = false; // 新增
+  win = false;
   gameStarted = true;
   dropNewFruit();
 }
@@ -286,6 +289,7 @@ function drawFruits() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  radiusList = getRadiusList();
 }
 
 // 以視窗寬度為基準動態產生半徑
