@@ -76,7 +76,7 @@ function draw() {
 "嘴巴閉上球就會掉下來\n" +
 "總共有6種大小的球\n" +
 "兩個相同大球碰在一起時會合併成下一個等級大小的圓\n" +
-"只要一次有3個最大的紫色球同時在畫面上 這樣就是贏了\n" +
+"只要一次有4個最大的紫色球同時在畫面上 這樣就是贏了\n" +
 "但只要球超過紅色線 就是輸了", width * 0.34, height * 0.665);// 這裡的文字大小依比例
 
   return;
@@ -87,10 +87,12 @@ function draw() {
     drawFruits();
     textSize(width * 0.08);
     fill(255, 0, 0);
+     noStroke();
     textAlign(CENTER, CENTER);
     text('Game Over', width / 2, height / 2 - height * 0.05);
     textSize(width * 0.04);
     fill(0);
+     noStroke();
     text('點擊任一處重新開始', width / 2, height / 2 + height * 0.05);
     return;
   }
@@ -99,11 +101,13 @@ function draw() {
   if (win) {
     drawFruits();
     textSize(width * 0.08);
-    fill('#a0f');
-    textAlign(CENTER, CENTER);
+    fill('#a0f');// 使用紫色
+    noStroke();
+    textAlign(CENTER, CENTER);// 文字置中
     text('你贏了！', width / 2, height / 2 - height * 0.05);
     textSize(width * 0.04);
-    fill(0);
+    fill(0);// 黑色文字
+    noStroke();
     text('點擊任一處重新開始', width / 2, height / 2 + height * 0.05);
     return;
   }
@@ -115,7 +119,7 @@ function draw() {
   // 勝利判斷
   let maxLevel = radiusList.length - 1;
   let bigCount = fruits.filter(f => f.level === maxLevel).length;
-  if (bigCount >= 3) {
+  if (bigCount >= 4) {
     win = true;
   }
 
