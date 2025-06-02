@@ -12,6 +12,7 @@ let mouthOpen = false;
 let mouthJustClosed = false;
 let gameOver = false;
 let gameStarted = false; // 新增：遊戲是否開始
+let win = false; // 新增
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -68,9 +69,29 @@ function draw() {
     return; // 不再 updateFruits
   }
 
+  // ======= 勝利畫面 =======
+  if (win) {
+    drawFruits();
+    textSize(64);
+    fill('#a0f');
+    textAlign(CENTER, CENTER);
+    text('你贏了！', width / 2, height / 2 - 40);
+    textSize(32);
+    fill(0);
+    text('點擊任一處重新開始', width / 2, height / 2 + 40);
+    return;
+  }
+
   detectFace();
   updateFruits();
   drawFruits();
+
+  // 勝利判斷（每幀都檢查）
+  let maxLevel = radiusList.length - 1;
+  let bigCount = fruits.filter(f => f.level === maxLevel).length;
+  if (bigCount >= 3) { // 由4改成3
+    win = true;
+  }
 }
 
 function mousePressed() {
@@ -80,8 +101,8 @@ function mousePressed() {
     if (mouseX > btnX - 100 && mouseX < btnX + 100 && mouseY > btnY - 50 && mouseY < btnY + 50) {
       startGame();
     }
-  } else if (gameOver) {
-    // 遊戲結束後點擊任一處重新開始
+  } else if (gameOver || win) {
+    // 遊戲結束或勝利後點擊任一處重新開始
     startGame();
   }
 }
@@ -90,6 +111,7 @@ function startGame() {
   fruits = [];
   currentFruit = null;
   gameOver = false;
+  win = false; // 新增
   gameStarted = true;
   dropNewFruit();
 }
@@ -187,25 +209,23 @@ function updateFruits() {
     }
   }
 
-  // === 不同大小圓形推開（只會邊框接觸） ===
+  // === 所有圓形都推開（不會重疊） ===
   for (let i = 0; i < fruits.length; i++) {
     for (let j = i + 1; j < fruits.length; j++) {
       let a = fruits[i], b = fruits[j];
-      if (a.level !== b.level) {
-        let dx = a.x - b.x;
-        let dy = a.y - b.y;
-        let distAB = sqrt(dx * dx + dy * dy);
-        let minDist = a.radius + b.radius;
-        if (distAB < minDist && distAB > 0.1) {
-          // 推開彼此
-          let overlap = minDist - distAB;
-          let pushX = (dx / distAB) * overlap * 0.5;
-          let pushY = (dy / distAB) * overlap * 0.5;
-          a.x += pushX;
-          a.y += pushY;
-          b.x -= pushX;
-          b.y -= pushY;
-        }
+      let dx = a.x - b.x;
+      let dy = a.y - b.y;
+      let distAB = sqrt(dx * dx + dy * dy);
+      let minDist = a.radius + b.radius;
+      if (distAB < minDist && distAB > 0.1) {
+        // 推開彼此
+        let overlap = minDist - distAB;
+        let pushX = (dx / distAB) * overlap * 0.5;
+        let pushY = (dy / distAB) * overlap * 0.5;
+        a.x += pushX;
+        a.y += pushY;
+        b.x -= pushX;
+        b.y -= pushY;
       }
     }
   }
@@ -226,10 +246,11 @@ function updateFruits() {
           if (newLevel < radiusList.length) {
             let newFruit = createFruit((a.x + b.x) / 2, (a.y + b.y) / 2, newLevel);
             fruits.push(newFruit);
+            a.merged = true;
+            b.merged = true;
           }
-          a.merged = true;
-          b.merged = true;
-          break; // 這一顆 a 已經合併，不要再跟其他水果合併
+          // 最大等級不合併也不消失
+          break;
         }
       }
     }
@@ -237,18 +258,6 @@ function updateFruits() {
 
   // 移除已合併的水果
   fruits = fruits.filter(f => !f.merged);
-
-  // === 判斷是否有圓碰到1/10高度的紅線 ===
-  for (let fruit of fruits) {
-    // 只判斷已經連續靜止6幀以上且已經通過紅線的圓
-    if (
-      fruit.passedLine &&
-      fruit.stableCount > 5 &&
-      fruit.y - fruit.radius <= lineY + 1
-    ) {
-      gameOver = true;
-    }
-  }
 
   // === 判斷是否有圓第2次碰到紅線且已經穩定 ===
   for (let fruit of fruits) {
