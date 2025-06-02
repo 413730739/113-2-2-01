@@ -33,15 +33,10 @@ function gotResults(results) {
 function draw() {
   background(240);
 
-  // 攝影機縮圖依比例
-  let camW = width * 0.15;
-  let camH = height * 0.15;
-  image(video, width - camW - 10, 10, camW, camH);
-
-  // 紅線高度依比例
+  // 紅線高度與粗細依比例
   stroke(255, 0, 0);
   strokeWeight(max(2, width * 0.005));
-  let lineY = height / 10;
+  let lineY = height * 0.1;
   line(0, lineY, width, lineY);
   noStroke();
 
@@ -50,7 +45,7 @@ function draw() {
     fill(255);
     stroke(0);
     rectMode(CENTER);
-    rect(width / 2, height / 2, width * 0.25, height * 0.12, 20);
+    rect(width / 2, height / 2, width * 0.25, height * 0.12, width * 0.03);
     fill(0);
     noStroke();
     textAlign(CENTER, CENTER);
@@ -95,6 +90,11 @@ function draw() {
   if (bigCount >= 3) {
     win = true;
   }
+
+  // 攝影機縮圖依比例（最後畫，確保在最上層）
+  let camW = width * 0.15;
+  let camH = height * 0.15;
+  image(video, width - camW - width * 0.01, height * 0.01, camW, camH);
 }
 
 function mousePressed() {
@@ -277,13 +277,14 @@ function drawFruits() {
   for (let fruit of fruits) {
     fill(fruit.color);
     noStroke();
-    circle(fruit.x, fruit.y, fruit.radius * 2);
+    circle(fruit.x, fruit.y, fruit.radius * 2); // 半徑已依比例
   }
 
   // 投擲提示線
   if (currentFruit) {
     stroke(0);
-    line(noseX, 0, noseX, 50);
+    strokeWeight(width * 0.005);
+    line(noseX, 0, noseX, height * 0.07);
   }
 }
 
@@ -292,7 +293,7 @@ function windowResized() {
   radiusList = getRadiusList();
 }
 
-// 以視窗寬度為基準動態產生半徑
+// 以視窗寬高最小值為基準動態產生半徑
 function getRadiusList() {
   let base = min(windowWidth, windowHeight);
   return [
