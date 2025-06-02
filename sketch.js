@@ -287,3 +287,16 @@ function drawFruits() {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+
+// 以視窗寬度為基準動態產生半徑
+function getRadiusList() {
+  let base = min(windowWidth, windowHeight);
+  return [
+    base * 0.07,
+    base * 0.09,
+    base * 0.11,
+    base * 0.13,
+    base * 0.15,
+    base * 0.17
+  ];
+}
