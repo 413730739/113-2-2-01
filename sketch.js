@@ -45,13 +45,41 @@ function draw() {
     fill(255);
     stroke(0);
     rectMode(CENTER);
-    rect(width / 2, height / 2, width * 0.25, height * 0.12, width * 0.03);
+    // 按鈕
+    let btnW = width * 0.25;
+    let btnH = height * 0.12;
+    let btnX = width / 2;
+    let btnY = height / 2;
+    rect(btnX, btnY, btnW, btnH, width * 0.03);
     fill(0);
     noStroke();
     textAlign(CENTER, CENTER);
     textSize(width * 0.04);
-    text("開始遊戲", width / 2, height / 2);
-    return;
+    text("開始遊戲", btnX, btnY);
+  // 規則框
+    let ruleW = width * 0.38;
+    let ruleH = height * 0.3;
+    let ruleX = width / 2;
+    let ruleY = btnY + btnH / 2 + ruleH / 2 + height * 0.08;
+    fill(255, 255, 220, 240);
+    
+    rect(ruleX, ruleY, ruleW, ruleH, width * 0.025);
+
+    
+    // 顯示"123"在畫面左上角
+    fill(0);
+    // 位置在800,400的點
+    textAlign(LEFT, TOP);
+    textSize(width * 0.0135);
+    text("以頭移動控制放置位子\n" +
+"嘴把張開可以產生一顆球(隨機大小)\n" +
+"嘴巴閉上球就會掉下來\n" +
+"總共有6種大小的球\n" +
+"兩個相同大球碰在一起時會合併成下一個等級大小的圓\n" +
+"只要一次有3個最大的紫色球同時在畫面上 這樣就是贏了\n" +
+"但只要球超過紅色線 就是輸了", width * 0.34, height * 0.665);// 這裡的文字大小依比例
+
+  return;
   }
 
   // ======= 遊戲結束畫面 =======
